@@ -45,13 +45,15 @@ def CheckEmail(email):
 usersAndAttempts = {}
 verifiedRoleID = 99
 
+class NoAttemptsLeft(Exception):
+    pass
+
 class EmailVerification(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        message = await member.send("To verify yourself and gain access to the server please enter your school email.")
+    async def VerifyMember(self, member):
+        message = await member.send("To verify yourself and gain access to the server please enter your school email. You have 3 attempts to enter a valid email.")
         channel = message.channel
         usersAndAttempts[member] = 3
         verifcationCode = GetVerificactionCode()
@@ -63,10 +65,12 @@ class EmailVerification(commands.Cog):
                 return True
             else:
                 usersAndAttempts[member] = usersAndAttempts[member] - 1
+                if usersAndAttempts[member] < 1:
+                    raise NoAttemptsLeft
                 return False
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
-            await member.send("You will be sent an email with a verification code. Please enter your verification code here.")
+            await member.send("You will be sent an email with a verification code. Please enter your verification code here. You have 3 attempts to enter the correct code.")
             usersAndAttempts[member] = 3
         except asyncio.TimeoutError:
             await member.send("You have ran out of time. Leave and rejoin the server to restart the verification process.")
@@ -78,6 +82,8 @@ class EmailVerification(commands.Cog):
                 return True
             else:
                 usersAndAttempts[member] = usersAndAttempts[member] - 1
+                if usersAndAttempts[member] < 1:
+                    raise NoAttemptsLeft
                 return False
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
@@ -87,6 +93,13 @@ class EmailVerification(commands.Cog):
             await member.send("You have ran out of time. Leave and rejoin the server to restart the verification process.")
             usersAndAttempts.pop(member)
             return
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        try:
+            await self.VerifyMember(member)
+        except NoAttemptsLeft:
+            await member.send("You have ran out of attempts. Leave and rejoin the server to restart the verification process.")
 
 def setup(client):
     client.add_cog(EmailVerification(client))
