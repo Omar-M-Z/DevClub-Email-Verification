@@ -58,22 +58,27 @@ class EmailVerification(commands.Cog):
 
         entry = None
         def check(entry):
-            if entry.content.endswith("isg.edu.sa") and entry.author == member and entry.channel == channel and CheckEmail(entry) == True:
+            if entry.content.endswith("isg.edu.sa") and entry.author == member and entry.channel == channel and CheckEmail(entry.content) == True:
                 SendVerificationEmail(entry.content, verifcationCode)
                 return True
             else:
-                await member.send("That is not a valid email address.")
+                usersAndAttempts[member] = usersAndAttempts[member] - 1
                 return False
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
             await member.send("You will be sent an email with a verification code. Please enter your verification code here.")
+            usersAndAttempts[member] = 3
         except asyncio.TimeoutError:
             await member.send("You have ran out of time. Leave and rejoin the server to restart the verification process.")
             usersAndAttempts.pop(member)
             return
 
         def check(entry):
-            return entry.content == verifcationCode and entry.author == member and entry.channel == channel
+            if entry.content == verifcationCode and entry.author == member and entry.channel == channel:
+                return True
+            else:
+                usersAndAttempts[member] = usersAndAttempts[member] - 1
+                return False
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
             await member.send("You have successfully been verified and will gain access to the server.")
