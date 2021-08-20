@@ -12,7 +12,7 @@ client = commands.Bot(command_prefix = "-", intents = intents)
 async def on_ready():
     print("The bot is ready.")
 
-cogs = ["Verification"]
+cogs = ["Cogs"]
 
 for i in range(len(cogs)):
     from os.path import realpath, split, join, splitext

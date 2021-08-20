@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 import random
 import string
@@ -18,16 +17,15 @@ def GetVerificactionCode():
             verificationCode = verificationCode + str(random.randint(0, 9))
     return verificationCode
 
-def SendVerificationEmail(address, verificationCode):
-    print(address)
+def SendVerificationEmail(address, verificationCode, member):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(os.environ.get("EMAIL_USER"), os.environ.get("EMAIL_PASS"))
-        bodyText = f"Your verification code for the DHS Developer Club Discord server is {verificationCode}. If you did not submit a request for this, then please ignore this email."
+        emailBodyText = f"Your verification code for the DHS Developer Club Discord server is {verificationCode}. This request was submitted by {member} on Discord. If you are not the submitter of this request, please ignore this email. \n\nThis email account is in no way affiliated with the ISG organization."
         message = MIMEMultipart()
-        message['From'] = "isg.email.verify@gmail.com"
+        message['From'] = "ISG Email Verification"
         message['To'] = address
         message['Subject'] = "DHS Developer Club Verification"
-        message.attach(MIMEText(bodyText, "plain"))
+        message.attach(MIMEText(emailBodyText.format(), "plain"))
         server.sendmail(os.environ.get("EMAIL_USER"), address, message.as_string())
         server.quit()
 
@@ -43,7 +41,7 @@ def CheckEmail(email):
         return False
 
 usersAndAttempts = {}
-verifiedRoleID = 99
+verifiedRoleID = 878308857577865306
 
 class NoAttemptsLeft(Exception):
     pass
@@ -61,7 +59,7 @@ class EmailVerification(commands.Cog):
         entry = None
         def check(entry):
             if entry.content.endswith("isg.edu.sa") and entry.author == member and entry.channel == channel and CheckEmail(entry.content) == True:
-                SendVerificationEmail(entry.content, verifcationCode)
+                SendVerificationEmail(entry.content, verifcationCode, member)
                 return True
             else:
                 usersAndAttempts[member] = usersAndAttempts[member] - 1
@@ -88,6 +86,7 @@ class EmailVerification(commands.Cog):
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
             await member.send("You have successfully been verified and will gain access to the server.")
+            await member.add_roles(member.guild.get_role(verifiedRoleID))
             usersAndAttempts.pop(member)
         except asyncio.TimeoutError:
             await member.send("You have ran out of time. Leave and rejoin the server to restart the verification process.")
@@ -96,6 +95,7 @@ class EmailVerification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        exit()
         try:
             await self.VerifyMember(member)
         except NoAttemptsLeft:
