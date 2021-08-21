@@ -12,6 +12,10 @@ client = commands.Bot(command_prefix = "-", intents = intents)
 async def on_ready():
     print("The bot is ready.")
 
+@client.command()
+async def ping(ctx):
+    await ctx.send(f"Ping: {round(client.latency * 1000)}ms")
+
 cogs = ["Cogs"]
 
 for i in range(len(cogs)):

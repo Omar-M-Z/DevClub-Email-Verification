@@ -95,7 +95,6 @@ class EmailVerification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        exit()
         try:
             await self.VerifyMember(member)
         except NoAttemptsLeft:
