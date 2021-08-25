@@ -41,7 +41,7 @@ def CheckEmail(email):
         return False
 
 usersAndAttempts = {}
-verifiedRoleID = 878308857577865306
+unverifiedRoleID = 879755217028149258
 
 class NoAttemptsLeft(Exception):
     pass
@@ -51,6 +51,7 @@ class EmailVerification(commands.Cog):
         self.client = client
 
     async def VerifyMember(self, member):
+        await member.add_roles(member.guild.get_role(unverifiedRoleID))
         message = await member.send("To verify yourself and gain access to the server please enter your school email. You have 3 attempts to enter a valid email.")
         channel = message.channel
         usersAndAttempts[member] = 3
@@ -86,7 +87,7 @@ class EmailVerification(commands.Cog):
         try:
             entry = await self.client.wait_for('message', check = check, timeout = 300)
             await member.send("You have successfully been verified and will gain access to the server.")
-            await member.add_roles(member.guild.get_role(verifiedRoleID))
+            await member.remove_roles(member.guild.get_role(unverifiedRoleID))
             usersAndAttempts.pop(member)
         except asyncio.TimeoutError:
             await member.send("You have ran out of time. Leave and rejoin the server to restart the verification process.")
