@@ -65,6 +65,7 @@ class EmailVerification(commands.Cog):
             else:
                 usersAndAttempts[member] = usersAndAttempts[member] - 1
                 if usersAndAttempts[member] < 1:
+                    usersAndAttempts.pop(member)
                     raise NoAttemptsLeft
                 return False
         try:
@@ -82,6 +83,7 @@ class EmailVerification(commands.Cog):
             else:
                 usersAndAttempts[member] = usersAndAttempts[member] - 1
                 if usersAndAttempts[member] < 1:
+                    usersAndAttempts.pop(member)
                     raise NoAttemptsLeft
                 return False
         try:
