@@ -22,9 +22,9 @@ def SendVerificationEmail(address, verificationCode, member):
         server.login(os.environ.get("EMAIL_USER"), os.environ.get("EMAIL_PASS"))
         emailBodyText = f"Your verification code for the DHS Developer Club Discord server is {verificationCode}. This request was submitted by {member} on Discord. If you are not the submitter of this request, please ignore this email. \n\nThis email account is in no way affiliated with the ISG organization."
         message = MIMEMultipart()
-        message['From'] = "ISG Email Verification"
+        message['From'] = "Developer Club Verification"
         message['To'] = address
-        message['Subject'] = "DHS Developer Club Verification"
+        message['Subject'] = "DHS Developer Club Discord Server Verification"
         message.attach(MIMEText(emailBodyText.format(), "plain"))
         server.sendmail(os.environ.get("EMAIL_USER"), address, message.as_string())
         server.quit()
