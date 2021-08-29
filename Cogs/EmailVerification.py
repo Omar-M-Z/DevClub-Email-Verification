@@ -7,6 +7,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import requests
+import datetime
 
 def GetVerificactionCode():
     verificationCode = ""
@@ -41,7 +42,10 @@ def CheckEmail(email):
         return False
 
 usersAndAttempts = {}
-unverifiedRoleID = 879755217028149258
+usersOnCooldown = {}
+#actual id = 879755217028149258
+unverifiedRoleID = 878308857577865306
+
 
 class NoAttemptsLeft(Exception):
     pass
@@ -98,10 +102,14 @@ class EmailVerification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        try:
-            await self.VerifyMember(member)
-        except NoAttemptsLeft:
-            await member.send("You have ran out of attempts. Leave and rejoin the server to restart the verification process.")
+        if member not in usersOnCooldown.keys():
+            try:
+                await self.VerifyMember(member)
+            except NoAttemptsLeft:
+                await member.send("You have ran out of attempts. Leave and rejoin the server to restart the verification process.")
+            usersOnCooldown[member] = datetime.datetime.now()
+        else:
+            await member.send("You are currently on cooldown, please try again later.")
 
 def setup(client):
     client.add_cog(EmailVerification(client))
