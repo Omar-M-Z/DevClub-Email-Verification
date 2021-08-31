@@ -8,6 +8,7 @@ cooldown = datetime.timedelta(hours = 10)
 class CooldownManager(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.UpdateCooldowns.start()
 
     @tasks.loop(minutes = 5)
     async def UpdateCooldowns(self):
