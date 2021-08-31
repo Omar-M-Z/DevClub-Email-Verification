@@ -43,8 +43,7 @@ def CheckEmail(email):
 
 usersAndAttempts = {}
 usersOnCooldown = {}
-#actual id = 879755217028149258
-unverifiedRoleID = 878308857577865306
+unverifiedRoleID = 879755217028149258
 
 
 class NoAttemptsLeft(Exception):
