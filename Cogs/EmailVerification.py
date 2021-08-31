@@ -54,7 +54,6 @@ class EmailVerification(commands.Cog):
         self.client = client
 
     async def VerifyMember(self, member):
-        await member.add_roles(member.guild.get_role(unverifiedRoleID))
         message = await member.send("To verify yourself and gain access to the server please enter your school email. You have 3 attempts to enter a valid email.")
         channel = message.channel
         usersAndAttempts[member] = 3
@@ -101,6 +100,7 @@ class EmailVerification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        await member.add_roles(member.guild.get_role(unverifiedRoleID))
         if member not in usersOnCooldown.keys():
             try:
                 await self.VerifyMember(member)
