@@ -1,2 +1,2 @@
 # DevClub-Email-Verification
-This is a Discord bot for making sure people who are joining a certain Discord server are from a certain organization.
+This is a simple Discord bot i created to verify students joining a school club's Discord server.
